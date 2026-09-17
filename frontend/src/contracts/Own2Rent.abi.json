@@ -1,0 +1,216 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "listingId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
+      { "indexed": false, "internalType": "address", "name": "nftContract", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "pricePerDay", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "durationDays", "type": "uint256" }
+    ],
+    "name": "AssetListed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "rentalId", "type": "uint256" },
+      { "indexed": true, "internalType": "uint256", "name": "listingId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "renter", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "startTime", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "endTime", "type": "uint256" }
+    ],
+    "name": "AssetRented",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "listingId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "name": "AssetReturned",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "listingId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "name": "ListingCancelled",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "listingId", "type": "uint256" }
+    ],
+    "name": "cancelListing",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "listingId", "type": "uint256" }
+    ],
+    "name": "claimBack",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllListings",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "id", "type": "uint256" },
+          { "internalType": "address", "name": "owner", "type": "address" },
+          { "internalType": "address", "name": "nftContract", "type": "address" },
+          { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+          { "internalType": "uint256", "name": "pricePerDay", "type": "uint256" },
+          { "internalType": "uint256", "name": "durationDays", "type": "uint256" },
+          { "internalType": "bool", "name": "active", "type": "bool" },
+          { "internalType": "bool", "name": "rented", "type": "bool" }
+        ],
+        "internalType": "struct Own2Rent.Listing[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "listingId", "type": "uint256" }
+    ],
+    "name": "getRentalByListing",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "listingId", "type": "uint256" },
+          { "internalType": "address", "name": "renter", "type": "address" },
+          { "internalType": "uint256", "name": "startTime", "type": "uint256" },
+          { "internalType": "uint256", "name": "endTime", "type": "uint256" },
+          { "internalType": "bool", "name": "active", "type": "bool" }
+        ],
+        "internalType": "struct Own2Rent.RentalAgreement",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "listingId", "type": "uint256" }
+    ],
+    "name": "isRentalActive",
+    "outputs": [
+      { "internalType": "bool", "name": "", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "nftContract", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "internalType": "uint256", "name": "pricePerDay", "type": "uint256" },
+      { "internalType": "uint256", "name": "durationDays", "type": "uint256" }
+    ],
+    "name": "listAsset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "listingToRental",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "listings",
+    "outputs": [
+      { "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "address", "name": "nftContract", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "internalType": "uint256", "name": "pricePerDay", "type": "uint256" },
+      { "internalType": "uint256", "name": "durationDays", "type": "uint256" },
+      { "internalType": "bool", "name": "active", "type": "bool" },
+      { "internalType": "bool", "name": "rented", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "bytes", "name": "", "type": "bytes" }
+    ],
+    "name": "onERC721Received",
+    "outputs": [
+      { "internalType": "bytes4", "name": "", "type": "bytes4" }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "listingId", "type": "uint256" }
+    ],
+    "name": "rentAsset",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "rentals",
+    "outputs": [
+      { "internalType": "uint256", "name": "listingId", "type": "uint256" },
+      { "internalType": "address", "name": "renter", "type": "address" },
+      { "internalType": "uint256", "name": "startTime", "type": "uint256" },
+      { "internalType": "uint256", "name": "endTime", "type": "uint256" },
+      { "internalType": "bool", "name": "active", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTotalListings",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTotalRentals",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

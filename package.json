@@ -1,0 +1,20 @@
+{
+  "name": "own2rent",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Own2Rent — Web3 digital asset rental platform (root workspace)",
+  "workspaces": [
+    "contracts",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspace=frontend",
+    "build:contracts": "npm run compile --workspace=contracts",
+    "test": "npm run test --workspace=contracts",
+    "node": "npm run node --workspace=contracts",
+    "deploy:local": "npm run deploy:local --workspace=contracts",
+    "deploy:bohr": "npm run deploy:bohr --workspace=contracts",
+    "install:all": "npm install --workspace=contracts && npm install --workspace=frontend"
+  }
+}

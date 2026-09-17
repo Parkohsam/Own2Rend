@@ -1,0 +1,23 @@
+{
+  "name": "own2rent-contracts",
+  "version": "0.1.0",
+  "description": "Own2Rent smart contracts — ERC-721 digital asset rental platform",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "coverage": "hardhat coverage",
+    "node": "hardhat node",
+    "deploy:local": "hardhat ignition deploy ignition/modules/Own2RentModule.ts --network localhost",
+    "deploy:bohr": "hardhat run scripts/deploy.ts --network bohr",
+    "clean": "hardhat clean"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.6.1",
+    "hardhat": "^2.22.0",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2"
+  }
+}

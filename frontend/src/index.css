@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-gray-950 text-white antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-purple-600 hover:bg-purple-500 active:bg-purple-700 
+           text-white font-semibold px-5 py-2.5 rounded-xl 
+           transition-all duration-200 disabled:opacity-40 
+           disabled:cursor-not-allowed focus:outline-none 
+           focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 
+           focus:ring-offset-gray-900;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-800 hover:bg-gray-700 active:bg-gray-900 
+           text-white font-semibold px-5 py-2.5 rounded-xl 
+           border border-gray-700 transition-all duration-200 
+           disabled:opacity-40 disabled:cursor-not-allowed 
+           focus:outline-none focus:ring-2 focus:ring-gray-500 
+           focus:ring-offset-2 focus:ring-offset-gray-900;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-500 text-white font-semibold 
+           px-5 py-2.5 rounded-xl transition-all duration-200 
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .card {
+    @apply bg-gray-900 border border-gray-800 rounded-2xl p-6 
+           hover:border-gray-700 transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply w-full bg-gray-800 border border-gray-700 rounded-xl 
+           px-4 py-3 text-white placeholder-gray-500 
+           focus:outline-none focus:ring-2 focus:ring-purple-500 
+           focus:border-transparent transition-all duration-200;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-400 mb-1.5;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-purple-400 to-cyan-400 
+           bg-clip-text text-transparent;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 
+           rounded-full text-xs font-medium;
+  }
+}
+
+/* Reown AppKit button overrides */
+appkit-button {
+  --wui-border-radius-m: 0.75rem;
+}
