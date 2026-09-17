@@ -27,13 +27,13 @@ export function ListingModal({
 
   // Form state
   const [nftContract, setNftContract] = useState<string>(
-    addresses.MOCK_NFT
+    String(addresses.MOCK_NFT)
   )
-  const [tokenId, setTokenId] = useState('0')
-  const [pricePerDay, setPricePerDay] = useState('0.1')
-  const [durationDays, setDurationDays] = useState('1')
+  const [tokenId, setTokenId] = useState<string>('0')
+  const [pricePerDay, setPricePerDay] = useState<string>('0.1')
+  const [durationDays, setDurationDays] = useState<string>('1')
   const [step, setStep] = useState<Step>('form')
-  const [formError, setFormError] = useState('')
+  const [formError, setFormError] = useState<string>('')
 
   const isValidTokenId =
     tokenId !== '' &&
@@ -45,12 +45,14 @@ export function ListingModal({
     isError: isOwnerError,
     isLoading: isCheckingOwner,
   } = useReadContract({
-    address: (nftContract as `0x${string}`) || undefined,
+    address: nftContract
+      ? (nftContract as `0x${string}`)
+      : undefined,
     abi: ERC721ABI,
     functionName: 'ownerOf',
     args: isValidTokenId ? [BigInt(tokenId)] : undefined,
     query: {
-      enabled: !!nftContract && isValidTokenId,
+      enabled: Boolean(nftContract) && isValidTokenId,
     },
   })
 
@@ -60,7 +62,7 @@ export function ListingModal({
     tokenOwner.toString().toLowerCase() ===
       userAddress.toLowerCase()
 
-  // Hooks
+  // Approval hook
   const {
     approve,
     isPending: isApprovePending,
@@ -68,10 +70,13 @@ export function ListingModal({
   } = useApproveNFT()
 
   const { isApproved } = useGetApproved(
-    nftContract as `0x${string}` | undefined,
-    tokenId ? BigInt(tokenId) : undefined
+    nftContract
+      ? (nftContract as `0x${string}`)
+      : undefined,
+    tokenId !== '' ? BigInt(tokenId) : undefined
   )
 
+  // Listing hook
   const {
     listAsset,
     isPending: isListPending,
@@ -80,6 +85,7 @@ export function ListingModal({
     error: listError,
   } = useListAsset()
 
+  // Mint hook
   const {
     mintNFT,
     isPending: isMintPending,
@@ -87,18 +93,18 @@ export function ListingModal({
     isSuccess: isMintSuccess,
   } = useMintNFT()
 
-  // After list success
+  // After listing success
   useEffect(() => {
-    if (isListSuccess) {
-      setStep('done')
+    if (!isListSuccess) return
 
-      const timer = setTimeout(() => {
-        onSuccess()
-        onClose()
-      }, 2000)
+    setStep('done')
 
-      return () => clearTimeout(timer)
-    }
+    const timer = setTimeout(() => {
+      onSuccess()
+      onClose()
+    }, 2000)
+
+    return () => clearTimeout(timer)
   }, [isListSuccess, onSuccess, onClose])
 
   const validate = () => {
@@ -149,12 +155,14 @@ export function ListingModal({
         nftContract as `0x${string}`,
         BigInt(tokenId)
       )
-    } catch (e) {
+    } catch {
       setStep('form')
     }
   }
 
   const handleList = () => {
+    if (!validate()) return
+
     setStep('list')
 
     listAsset(
@@ -189,6 +197,7 @@ export function ListingModal({
           </h2>
 
           <button
+            type="button"
             onClick={onClose}
             className="text-gray-400 hover:text-white transition-colors p-1"
           >
@@ -223,7 +232,7 @@ export function ListingModal({
                   <button
                     type="button"
                     onClick={() =>
-                      setNftContract(addresses.MOCK_NFT)
+                      setNftContract(String(addresses.MOCK_NFT))
                     }
                     className="text-xs text-purple-400 hover:text-purple-300 underline font-mono"
                   >
@@ -244,10 +253,10 @@ export function ListingModal({
                   {isMintPending
                     ? 'Confirm mint in wallet…'
                     : isMintConfirming
-                    ? 'Minting NFT on Bohr…'
-                    : isMintSuccess
-                    ? '✓ Minted! (Check Token ID: 0, 1, 2...)'
-                    : '🎁 Mint Free Test NFT'}
+                      ? 'Minting NFT on Bohr…'
+                      : isMintSuccess
+                        ? '✓ Minted! (Check Token ID: 0, 1, 2...)'
+                        : '🎁 Mint Free Test NFT'}
                 </button>
               </div>
 
@@ -274,8 +283,8 @@ export function ListingModal({
                     className="input-field font-mono text-sm"
                     placeholder="0x..."
                     value={nftContract}
-                    onChange={(e) =>
-                      setNftContract(e.target.value)
+                    onChange={(event) =>
+                      setNftContract(String(event.target.value))
                     }
                   />
                 </div>
@@ -287,7 +296,7 @@ export function ListingModal({
                     </label>
 
                     {nftContract.toLowerCase() ===
-                      addresses.MOCK_NFT.toLowerCase() && (
+                      String(addresses.MOCK_NFT).toLowerCase() && (
                       <div className="flex items-center gap-1">
                         <span className="text-xs text-gray-500">
                           Quick select:
@@ -319,8 +328,8 @@ export function ListingModal({
                     placeholder="0"
                     min="0"
                     value={tokenId}
-                    onChange={(e) =>
-                      setTokenId(e.target.value)
+                    onChange={(event) =>
+                      setTokenId(String(event.target.value))
                     }
                   />
 
@@ -361,8 +370,8 @@ export function ListingModal({
                       min="0"
                       step="0.01"
                       value={pricePerDay}
-                      onChange={(e) =>
-                        setPricePerDay(e.target.value)
+                      onChange={(event) =>
+                        setPricePerDay(String(event.target.value))
                       }
                     />
                   </div>
@@ -379,8 +388,8 @@ export function ListingModal({
                       min="1"
                       max="365"
                       value={durationDays}
-                      onChange={(e) =>
-                        setDurationDays(e.target.value)
+                      onChange={(event) =>
+                        setDurationDays(String(event.target.value))
                       }
                     />
                   </div>
@@ -450,6 +459,7 @@ export function ListingModal({
                 {/* Action buttons */}
                 {!isApproved ? (
                   <button
+                    type="button"
                     className="btn-primary w-full"
                     onClick={handleApprove}
                     disabled={
@@ -462,6 +472,7 @@ export function ListingModal({
                   </button>
                 ) : (
                   <button
+                    type="button"
                     className="btn-primary w-full"
                     onClick={handleList}
                     disabled={isListPending || isConfirming}
@@ -469,8 +480,8 @@ export function ListingModal({
                     {isListPending
                       ? 'Confirm in wallet…'
                       : isConfirming
-                      ? 'Listing on-chain…'
-                      : 'Step 2: List Asset'}
+                        ? 'Listing on-chain…'
+                        : 'Step 2: List Asset'}
                   </button>
                 )}
               </div>
