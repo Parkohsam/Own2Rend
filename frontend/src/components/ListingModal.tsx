@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
 import { parseEther } from 'viem'
 import { useChainId, useAccount, useReadContract } from 'wagmi'
-import { useApproveNFT, useGetApproved, useListAsset } from '../hooks/useListAsset'
+import {
+  useApproveNFT,
+  useGetApproved,
+  useListAsset,
+} from '../hooks/useListAsset'
 import { useMintNFT } from '../hooks/useMintNFT'
 import { getAddresses } from '../contracts/addresses'
 import ERC721ABI from '../contracts/ERC721.abi.json'
@@ -13,53 +17,87 @@ interface ListingModalProps {
 
 type Step = 'form' | 'approve' | 'list' | 'done'
 
-export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
+export function ListingModal({
+  onClose,
+  onSuccess,
+}: ListingModalProps) {
   const chainId = useChainId()
   const addresses = getAddresses(chainId)
   const { address: userAddress } = useAccount()
 
   // Form state
-  const [nftContract, setNftContract] = useState(addresses.MOCK_NFT)
+  const [nftContract, setNftContract] = useState<string>(
+    addresses.MOCK_NFT
+  )
   const [tokenId, setTokenId] = useState('0')
   const [pricePerDay, setPricePerDay] = useState('0.1')
   const [durationDays, setDurationDays] = useState('1')
   const [step, setStep] = useState<Step>('form')
   const [formError, setFormError] = useState('')
 
-  const isValidTokenId = tokenId !== '' && !isNaN(Number(tokenId)) && Number(tokenId) >= 0
+  const isValidTokenId =
+    tokenId !== '' &&
+    !isNaN(Number(tokenId)) &&
+    Number(tokenId) >= 0
 
-  const { data: tokenOwner, isError: isOwnerError, isLoading: isCheckingOwner } = useReadContract({
+  const {
+    data: tokenOwner,
+    isError: isOwnerError,
+    isLoading: isCheckingOwner,
+  } = useReadContract({
     address: (nftContract as `0x${string}`) || undefined,
     abi: ERC721ABI,
     functionName: 'ownerOf',
     args: isValidTokenId ? [BigInt(tokenId)] : undefined,
-    query: { enabled: !!nftContract && isValidTokenId },
+    query: {
+      enabled: !!nftContract && isValidTokenId,
+    },
   })
 
   const isUserOwner =
     tokenOwner &&
     userAddress &&
-    tokenOwner.toString().toLowerCase() === userAddress.toLowerCase()
+    tokenOwner.toString().toLowerCase() ===
+      userAddress.toLowerCase()
 
   // Hooks
-  const { approve, isPending: isApprovePending, error: approveError } = useApproveNFT()
+  const {
+    approve,
+    isPending: isApprovePending,
+    error: approveError,
+  } = useApproveNFT()
+
   const { isApproved } = useGetApproved(
     nftContract as `0x${string}` | undefined,
     tokenId ? BigInt(tokenId) : undefined
   )
-  const { listAsset, isPending: isListPending, isConfirming, isSuccess: isListSuccess, error: listError } =
-    useListAsset()
-  const { mintNFT, isPending: isMintPending, isConfirming: isMintConfirming, isSuccess: isMintSuccess } =
-    useMintNFT()
+
+  const {
+    listAsset,
+    isPending: isListPending,
+    isConfirming,
+    isSuccess: isListSuccess,
+    error: listError,
+  } = useListAsset()
+
+  const {
+    mintNFT,
+    isPending: isMintPending,
+    isConfirming: isMintConfirming,
+    isSuccess: isMintSuccess,
+  } = useMintNFT()
 
   // After list success
   useEffect(() => {
     if (isListSuccess) {
       setStep('done')
-      setTimeout(() => {
+
+      const timer = setTimeout(() => {
         onSuccess()
         onClose()
       }, 2000)
+
+      return () => clearTimeout(timer)
     }
   }, [isListSuccess, onSuccess, onClose])
 
@@ -68,27 +106,49 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
       setFormError('Invalid NFT contract address')
       return false
     }
-    if (!tokenId || isNaN(Number(tokenId)) || Number(tokenId) < 0) {
+
+    if (
+      !tokenId ||
+      isNaN(Number(tokenId)) ||
+      Number(tokenId) < 0
+    ) {
       setFormError('Invalid token ID')
       return false
     }
-    if (!pricePerDay || isNaN(Number(pricePerDay)) || Number(pricePerDay) <= 0) {
+
+    if (
+      !pricePerDay ||
+      isNaN(Number(pricePerDay)) ||
+      Number(pricePerDay) <= 0
+    ) {
       setFormError('Price per day must be greater than 0')
       return false
     }
-    if (!durationDays || isNaN(Number(durationDays)) || Number(durationDays) < 1 || Number(durationDays) > 365) {
+
+    if (
+      !durationDays ||
+      isNaN(Number(durationDays)) ||
+      Number(durationDays) < 1 ||
+      Number(durationDays) > 365
+    ) {
       setFormError('Duration must be between 1 and 365 days')
       return false
     }
+
     setFormError('')
     return true
   }
 
   const handleApprove = async () => {
     if (!validate()) return
+
     setStep('approve')
+
     try {
-      await approve(nftContract as `0x${string}`, BigInt(tokenId))
+      await approve(
+        nftContract as `0x${string}`,
+        BigInt(tokenId)
+      )
     } catch (e) {
       setStep('form')
     }
@@ -96,6 +156,7 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
 
   const handleList = () => {
     setStep('list')
+
     listAsset(
       nftContract as `0x${string}`,
       BigInt(tokenId),
@@ -104,9 +165,12 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
     )
   }
 
-  const totalCost = pricePerDay && durationDays
-    ? (Number(pricePerDay) * Number(durationDays)).toFixed(4)
-    : '—'
+  const totalCost =
+    pricePerDay && durationDays
+      ? (
+          Number(pricePerDay) * Number(durationDays)
+        ).toFixed(4)
+      : '—'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -120,7 +184,10 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
       <div className="relative bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-800">
-          <h2 className="text-xl font-bold text-white">List Asset for Rent</h2>
+          <h2 className="text-xl font-bold text-white">
+            List Asset for Rent
+          </h2>
+
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white transition-colors p-1"
@@ -133,7 +200,11 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
           {step === 'done' && (
             <div className="text-center py-8 space-y-3">
               <div className="text-5xl">🎉</div>
-              <p className="text-xl font-bold text-white">Asset Listed!</p>
+
+              <p className="text-xl font-bold text-white">
+                Asset Listed!
+              </p>
+
               <p className="text-gray-400 text-sm">
                 Your NFT is now available to rent. Redirecting…
               </p>
@@ -145,18 +216,25 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
               {/* Testnet Helper */}
               <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-purple-300">🧪 Bohr Testnet Helper</span>
+                  <span className="text-xs font-semibold text-purple-300">
+                    🧪 Bohr Testnet Helper
+                  </span>
+
                   <button
                     type="button"
-                    onClick={() => setNftContract(addresses.MOCK_NFT)}
+                    onClick={() =>
+                      setNftContract(addresses.MOCK_NFT)
+                    }
                     className="text-xs text-purple-400 hover:text-purple-300 underline font-mono"
                   >
                     Use MockNFT Address
                   </button>
                 </div>
+
                 <p className="text-xs text-gray-400">
                   Need a test NFT to list? Mint one for free to your wallet right now.
                 </p>
+
                 <button
                   type="button"
                   onClick={() => mintNFT()}
@@ -176,59 +254,83 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
               {/* Info */}
               <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-3">
                 <p className="text-xs text-gray-400">
-                  Enter the <span className="text-white font-medium">real ERC-721 contract address</span> and token ID you own. You must be the owner and have approved Own2Rent.
+                  Enter the{' '}
+                  <span className="text-white font-medium">
+                    real ERC-721 contract address
+                  </span>{' '}
+                  and token ID you own. You must be the owner and have approved Own2Rent.
                 </p>
               </div>
 
               {/* Form */}
               <div className="space-y-4">
                 <div>
-                  <label className="label">NFT Contract Address</label>
+                  <label className="label">
+                    NFT Contract Address
+                  </label>
+
                   <input
                     type="text"
                     className="input-field font-mono text-sm"
                     placeholder="0x..."
                     value={nftContract}
-                    onChange={(e) => setNftContract(e.target.value)}
+                    onChange={(e) =>
+                      setNftContract(e.target.value)
+                    }
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="label mb-0">Token ID</label>
-                    {nftContract.toLowerCase() === addresses.MOCK_NFT.toLowerCase() && (
+                    <label className="label mb-0">
+                      Token ID
+                    </label>
+
+                    {nftContract.toLowerCase() ===
+                      addresses.MOCK_NFT.toLowerCase() && (
                       <div className="flex items-center gap-1">
-                        <span className="text-xs text-gray-500">Quick select:</span>
-                        {['0', '1', '2', '3', '4', '5'].map((id) => (
-                          <button
-                            key={id}
-                            type="button"
-                            onClick={() => setTokenId(id)}
-                            className={`px-1.5 py-0.5 text-xs rounded font-mono transition-colors ${
-                              tokenId === id
-                                ? 'bg-purple-600 text-white font-bold'
-                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                            }`}
-                          >
-                            #{id}
-                          </button>
-                        ))}
+                        <span className="text-xs text-gray-500">
+                          Quick select:
+                        </span>
+
+                        {['0', '1', '2', '3', '4', '5'].map(
+                          (id) => (
+                            <button
+                              key={id}
+                              type="button"
+                              onClick={() => setTokenId(id)}
+                              className={`px-1.5 py-0.5 text-xs rounded font-mono transition-colors ${
+                                tokenId === id
+                                  ? 'bg-purple-600 text-white font-bold'
+                                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                              }`}
+                            >
+                              #{id}
+                            </button>
+                          )
+                        )}
                       </div>
                     )}
                   </div>
+
                   <input
                     type="number"
                     className="input-field"
                     placeholder="0"
                     min="0"
                     value={tokenId}
-                    onChange={(e) => setTokenId(e.target.value)}
+                    onChange={(e) =>
+                      setTokenId(e.target.value)
+                    }
                   />
-                  {/* Real-time token ownership validation feedback */}
+
+                  {/* Real-time token ownership validation */}
                   {isValidTokenId && (
                     <div className="mt-1.5 text-xs">
                       {isCheckingOwner ? (
-                        <span className="text-gray-400">Verifying token on-chain...</span>
+                        <span className="text-gray-400">
+                          Verifying token on-chain...
+                        </span>
                       ) : isUserOwner ? (
                         <span className="text-green-400 font-medium">
                           ✓ Verified: Your wallet owns Token #{tokenId}
@@ -248,7 +350,10 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="label">Price / Day (BOT)</label>
+                    <label className="label">
+                      Price / Day (BOT)
+                    </label>
+
                     <input
                       type="number"
                       className="input-field"
@@ -256,11 +361,17 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
                       min="0"
                       step="0.01"
                       value={pricePerDay}
-                      onChange={(e) => setPricePerDay(e.target.value)}
+                      onChange={(e) =>
+                        setPricePerDay(e.target.value)
+                      }
                     />
                   </div>
+
                   <div>
-                    <label className="label">Duration (days)</label>
+                    <label className="label">
+                      Duration (days)
+                    </label>
+
                     <input
                       type="number"
                       className="input-field"
@@ -268,7 +379,9 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
                       min="1"
                       max="365"
                       value={durationDays}
-                      onChange={(e) => setDurationDays(e.target.value)}
+                      onChange={(e) =>
+                        setDurationDays(e.target.value)
+                      }
                     />
                   </div>
                 </div>
@@ -278,11 +391,16 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
                   <div className="bg-gray-800/50 rounded-xl p-3 text-sm space-y-1">
                     <div className="flex justify-between text-gray-400">
                       <span>Renter will pay</span>
-                      <span className="font-bold text-purple-400">{totalCost} BOT total</span>
+                      <span className="font-bold text-purple-400">
+                        {totalCost} BOT total
+                      </span>
                     </div>
+
                     <div className="flex justify-between text-gray-400">
                       <span>You receive instantly</span>
-                      <span className="text-green-400 font-semibold">{totalCost} BOT</span>
+                      <span className="text-green-400 font-semibold">
+                        {totalCost} BOT
+                      </span>
                     </div>
                   </div>
                 )}
@@ -298,11 +416,35 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
 
                 {/* Step indicator */}
                 <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border ${step === 'form' ? 'border-purple-500 text-purple-400' : 'border-green-500 text-green-400'}`}>1</span>
-                  <span className="text-gray-600">Approve NFT</span>
+                  <span
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border ${
+                      step === 'form'
+                        ? 'border-purple-500 text-purple-400'
+                        : 'border-green-500 text-green-400'
+                    }`}
+                  >
+                    1
+                  </span>
+
+                  <span className="text-gray-600">
+                    Approve NFT
+                  </span>
+
                   <span className="text-gray-700">→</span>
-                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border ${(step as string) === 'list' ? 'border-purple-500 text-purple-400' : (step as string) === 'done' ? 'border-green-500 text-green-400' : 'border-gray-700 text-gray-600'}`}>2</span>
-                  <span className="text-gray-600">List Asset</span>
+
+                  <span
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border ${
+                      step === 'list'
+                        ? 'border-purple-500 text-purple-400'
+                        : 'border-gray-700 text-gray-600'
+                    }`}
+                  >
+                    2
+                  </span>
+
+                  <span className="text-gray-600">
+                    List Asset
+                  </span>
                 </div>
 
                 {/* Action buttons */}
@@ -310,7 +452,9 @@ export function ListingModal({ onClose, onSuccess }: ListingModalProps) {
                   <button
                     className="btn-primary w-full"
                     onClick={handleApprove}
-                    disabled={isApprovePending || step === 'approve'}
+                    disabled={
+                      isApprovePending || step === 'approve'
+                    }
                   >
                     {isApprovePending || step === 'approve'
                       ? 'Approving in wallet…'
