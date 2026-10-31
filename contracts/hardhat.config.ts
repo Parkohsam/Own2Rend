@@ -2,7 +2,9 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ path: ".env" });
+
+require("hardhat/config");
 
 const isValidPrivateKey = (key?: string): boolean => {
   if (!key) return false;
@@ -55,6 +57,24 @@ const config: HardhatUserConfig = {
       accounts: [PRIVATE_KEY],
       gasPrice: 40_000_000_000,
       gasMultiplier: 1.2,
+      timeout: 120_000,
+    },
+
+    bohrMainnet: {
+      url: process.env.BOHR_MAINNET_RPC || "https://rpc.botchain.ai",
+      chainId: 677,
+      accounts: [PRIVATE_KEY],
+      gasPrice: 40_000_000_000,
+      gasMultiplier: 1.2,
+      timeout: 120_000,
+    },
+
+    mainnet: {
+      url: "https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}",
+      chainId: 1,
+      accounts: [PRIVATE_KEY],
+      gasPrice: 40_000_000_000,
+      gasMultiplier: 1.3,
       timeout: 120_000,
     },
   },

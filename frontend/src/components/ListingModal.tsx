@@ -25,11 +25,15 @@ export function ListingModal({
   const addresses = getAddresses(chainId)
   const { address: userAddress } = useAccount()
 
+  const hasMockNFT =
+    addresses.MOCK_NFT &&
+    addresses.MOCK_NFT !== '0x0000000000000000000000000000000000000000'
+
   // Form state
   const [nftContract, setNftContract] = useState<string>(
-    String(addresses.MOCK_NFT)
+    hasMockNFT ? String(addresses.MOCK_NFT) : ''
   )
-  const [tokenId, setTokenId] = useState<string>('0')
+  const [tokenId, setTokenId] = useState<string>(hasMockNFT ? '0' : '')
   const [pricePerDay, setPricePerDay] = useState<string>('0.1')
   const [durationDays, setDurationDays] = useState<string>('1')
   const [step, setStep] = useState<Step>('form')
@@ -108,8 +112,11 @@ export function ListingModal({
   }, [isListSuccess, onSuccess, onClose])
 
   const validate = () => {
-    if (!nftContract.match(/^0x[0-9a-fA-F]{40}$/)) {
-      setFormError('Invalid NFT contract address')
+    if (
+      !nftContract.match(/^0x[0-9a-fA-F]{40}$/) ||
+      nftContract === '0x0000000000000000000000000000000000000000'
+    ) {
+      setFormError('Please enter a valid NFT contract address (not zero address)')
       return false
     }
 
@@ -304,8 +311,9 @@ export function ListingModal({
                       Token ID
                     </label>
 
-                    {nftContract.toLowerCase() ===
-                      String(addresses.MOCK_NFT).toLowerCase() && (
+                    {hasMockNFT &&
+                      nftContract.toLowerCase() ===
+                        String(addresses.MOCK_NFT).toLowerCase() && (
                       <div className="flex items-center gap-1">
                         <span className="text-xs text-gray-500">
                           Quick select:
@@ -472,12 +480,22 @@ export function ListingModal({
                     className="btn-primary w-full"
                     onClick={handleApprove}
                     disabled={
-                      isApprovePending || step === 'approve'
+                      isApprovePending ||
+                      step === 'approve' ||
+                      isCheckingOwner ||
+                      (isValidTokenId && Boolean(tokenOwner) && !isUserOwner) ||
+                      (isValidTokenId && isOwnerError)
                     }
                   >
                     {isApprovePending || step === 'approve'
                       ? 'Approving in wallet…'
-                      : 'Step 1: Approve NFT Transfer'}
+                      : isCheckingOwner
+                        ? 'Verifying ownership…'
+                        : isValidTokenId && isOwnerError
+                          ? 'Token Not Minted'
+                          : isValidTokenId && Boolean(tokenOwner) && !isUserOwner
+                            ? 'Not Token Owner'
+                            : 'Step 1: Approve NFT Transfer'}
                   </button>
                 ) : (
                   <button

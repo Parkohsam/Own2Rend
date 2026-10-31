@@ -9,6 +9,7 @@
     "node": "hardhat node",
     "deploy:local": "hardhat ignition deploy ignition/modules/Own2RentModule.ts --network localhost",
     "deploy:bohr": "hardhat run scripts/deploy.ts --network bohr",
+    "deploy:mainnet": "hardhat run scripts/deployMainnet.ts --network bohrMainnet",
     "clean": "hardhat clean"
   },
   "devDependencies": {
