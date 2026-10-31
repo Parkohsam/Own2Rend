@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useChainId } from 'wagmi'
 import { ListingModal } from '../components/ListingModal'
 import { useActiveListings } from '../hooks/useRentals'
 
 export function ListPage() {
   const { isConnected } = useAccount()
+  const chainId = useChainId()
+  const isMainnet = chainId === 677
   const [showModal, setShowModal] = useState(false)
   const { refetch } = useActiveListings()
 
@@ -75,13 +77,21 @@ export function ListPage() {
       </div>
 
       {/* Notice */}
-      <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4 text-sm text-yellow-300 space-y-1">
-        <p className="font-semibold">⚠️ Testnet Only</p>
-        <p className="text-yellow-400/70">
-          This platform runs on the Bohr Testnet. Use only test BOT tokens.
-          All transactions are free of real value.
-        </p>
-      </div>
+      {isMainnet ? (
+        <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-sm text-green-300 space-y-1">
+          <p className="font-semibold">🟢 BOT Chain Mainnet Active</p>
+          <p className="text-green-400/80">
+            You are connected to the live BOT Chain Mainnet. Rental payments and asset listings execute with real BOT tokens.
+          </p>
+        </div>
+      ) : (
+        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4 text-sm text-yellow-300 space-y-1">
+          <p className="font-semibold">⚠️ Testnet Mode</p>
+          <p className="text-yellow-400/70">
+            This platform is currently running on the Bohr Testnet. Use test BOT tokens.
+          </p>
+        </div>
+      )}
 
       {/* CTA */}
       <button

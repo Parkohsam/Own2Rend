@@ -1,4 +1,11 @@
+import { useChainId } from 'wagmi'
+
 export function Footer() {
+  const chainId = useChainId()
+  const isMainnet = chainId === 677
+  const explorerUrl = isMainnet ? 'https://scan.botchain.ai' : 'https://scan.bohr.life'
+  const networkName = isMainnet ? 'BOT Chain Mainnet' : chainId === 968 ? 'Bohr Testnet' : `Chain ID: ${chainId}`
+
   return (
     <footer className="border-t border-gray-800 mt-16 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,15 +17,15 @@ export function Footer() {
           </div>
           <div className="flex items-center gap-4">
             <a
-              href="https://scan.bohr.life"
+              href={explorerUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-purple-400 transition-colors"
             >
-              Bohr Explorer ↗
+              {isMainnet ? 'Botscan Explorer ↗' : 'Bohr Explorer ↗'}
             </a>
             <span className="text-gray-700">|</span>
-            <span>Chain ID: 968</span>
+            <span className={isMainnet ? 'text-green-400 font-medium' : ''}>{networkName} ({chainId})</span>
           </div>
         </div>
       </div>

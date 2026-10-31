@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useChainId } from 'wagmi'
 import { useActiveListings } from '../hooks/useRentals'
 import { useRentalByListing } from '../hooks/useRentals'
 import { AssetCard } from '../components/AssetCard'
@@ -20,6 +20,9 @@ function ListingCard({ listing, onSuccess }: { listing: Listing; onSuccess: () =
 
 export function HomePage() {
   const { isConnected } = useAccount()
+  const chainId = useChainId()
+  const isMainnet = chainId === 677
+  const explorerUrl = isMainnet ? 'https://scan.botchain.ai' : 'https://scan.bohr.life'
   const { listings, isLoading, refetch } = useActiveListings()
   const [showModal, setShowModal] = useState(false)
   const [filter, setFilter] = useState<'all' | 'available' | 'rented'>('all')
@@ -40,7 +43,10 @@ export function HomePage() {
         </h1>
         <p className="text-gray-400 text-lg max-w-xl mx-auto">
           Browse NFT listings, rent with BOT tokens, and own access rights —
-          all enforced by smart contracts on the Bohr testnet.
+          all enforced by smart contracts on the{' '}
+          <span className={isMainnet ? 'text-green-400 font-semibold' : 'text-purple-400'}>
+            {isMainnet ? 'BOT Chain Mainnet' : 'Bohr Testnet'}
+          </span>.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           {isConnected ? (
@@ -53,12 +59,12 @@ export function HomePage() {
             </div>
           )}
           <a
-            href="https://scan.bohr.life"
+            href={explorerUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-secondary text-sm"
           >
-            View on Explorer ↗
+            {isMainnet ? 'View on Botscan ↗' : 'View on Bohr Explorer ↗'}
           </a>
         </div>
       </div>

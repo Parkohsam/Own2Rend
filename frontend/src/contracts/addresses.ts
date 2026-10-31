@@ -13,12 +13,22 @@ export const CONTRACT_ADDRESSES = {
     OWN2RENT: '0x5eb8f9ac22A0add48BAa15Bd5C90DCf14a09AF36' as `0x${string}`,
     MOCK_NFT:  '0x6534051D574395D79a551aB525A4435b565b7Eee' as `0x${string}`,
   },
+  /** BOT Chain (Bohr) Mainnet (chainId 677) */
+  677: {
+    OWN2RENT: '0xfc1e08f6A6454fa53f05be0023B30c68eA25EbbD' as `0x${string}`,
+    MOCK_NFT:  '0x0000000000000000000000000000000000000000' as `0x${string}`,
+  },
+  /** Ethereum Mainnet (chainId 1) */
+  1: {
+    OWN2RENT: '0x0000000000000000000000000000000000000000' as `0x${string}`,
+    MOCK_NFT:  '0x0000000000000000000000000000000000000000' as `0x${string}`,
+  },
 } as const
 
 export type SupportedChainId = keyof typeof CONTRACT_ADDRESSES
 
-/** Returns addresses for the given chainId, falling back to local defaults. */
+/** Returns addresses for the given chainId, falling back to mainnet defaults. */
 export function getAddresses(chainId?: number) {
   const id = chainId as SupportedChainId
-  return CONTRACT_ADDRESSES[id] ?? CONTRACT_ADDRESSES[968]
+  return CONTRACT_ADDRESSES[id] ?? CONTRACT_ADDRESSES[677]
 }

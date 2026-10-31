@@ -3,6 +3,35 @@ import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { defineChain } from 'viem'
 import { QueryClient } from '@tanstack/react-query'
 
+// ─── Ethereum Mainnet Definition ──────────────────────────────────────────────
+export const mainnet = defineChain({
+  id: 1,
+  name: 'Ethereum Mainnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'ETH',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://mainnet.infura.io/v3'],
+    },
+    public: {
+      http: ['https://mainnet.infura.io/v3'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Etherscan',
+      url: 'https://etherscan.io',
+    },
+  },
+  fees: {
+    defaultPriorityFee: 25_000_000_000n, // 25 Gwei
+  },
+  testnet: false,
+})
+
 // ─── Bohr Testnet Definition ─────────────────────────────────────────────────
 
 export const bohrTestnet = defineChain({
@@ -33,12 +62,41 @@ export const bohrTestnet = defineChain({
   testnet: true,
 })
 
+// ─── BOT Chain (Bohr) Mainnet Definition ────────────────────────────────────
+export const botchainMainnet = defineChain({
+  id: 677,
+  name: 'BOT Chain Mainnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'BOT',
+    symbol: 'BOT',
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.botchain.ai'],
+    },
+    public: {
+      http: ['https://rpc.botchain.ai'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Botscan',
+      url: 'https://scan.botchain.ai',
+    },
+  },
+  fees: {
+    defaultPriorityFee: 25_000_000_000n, // 25 Gwei
+  },
+  testnet: false,
+})
+
 // ─── Reown AppKit Setup ───────────────────────────────────────────────────────
 
 // Get your Project ID from https://dashboard.reown.com (free)
 const projectId = import.meta.env.VITE_REOWN_PROJECT_ID || 'YOUR_PROJECT_ID'
 
-export const networks = [bohrTestnet] as const
+export const networks = [botchainMainnet, bohrTestnet, mainnet] as const
 
 export const wagmiAdapter = new WagmiAdapter({
   networks: networks as any,

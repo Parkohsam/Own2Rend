@@ -223,42 +223,51 @@ export function ListingModal({
           {step !== 'done' && (
             <>
               {/* Testnet Helper */}
-              <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-purple-300">
-                    🧪 Bohr Testnet Helper
-                  </span>
+              {chainId === 968 ? (
+                <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-purple-300">
+                      🧪 Bohr Testnet Helper
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setNftContract(String(addresses.MOCK_NFT))
+                      }
+                      className="text-xs text-purple-400 hover:text-purple-300 underline font-mono"
+                    >
+                      Use MockNFT Address
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-gray-400">
+                    Need a test NFT to list? Mint one for free to your wallet right now.
+                  </p>
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setNftContract(String(addresses.MOCK_NFT))
-                    }
-                    className="text-xs text-purple-400 hover:text-purple-300 underline font-mono"
+                    onClick={() => mintNFT()}
+                    disabled={isMintPending || isMintConfirming}
+                    className="btn-secondary w-full text-xs py-1.5"
                   >
-                    Use MockNFT Address
+                    {isMintPending
+                      ? 'Confirm mint in wallet…'
+                      : isMintConfirming
+                        ? 'Minting NFT on Bohr…'
+                        : isMintSuccess
+                          ? '✓ Minted! (Check Token ID: 0, 1, 2...)'
+                          : '🎁 Mint Free Test NFT'}
                   </button>
                 </div>
-
-                <p className="text-xs text-gray-400">
-                  Need a test NFT to list? Mint one for free to your wallet right now.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => mintNFT()}
-                  disabled={isMintPending || isMintConfirming}
-                  className="btn-secondary w-full text-xs py-1.5"
-                >
-                  {isMintPending
-                    ? 'Confirm mint in wallet…'
-                    : isMintConfirming
-                      ? 'Minting NFT on Bohr…'
-                      : isMintSuccess
-                        ? '✓ Minted! (Check Token ID: 0, 1, 2...)'
-                        : '🎁 Mint Free Test NFT'}
-                </button>
-              </div>
+              ) : (
+                <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3">
+                  <p className="text-xs text-green-300 font-semibold">🟢 BOT Chain Mainnet Active</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Enter the contract address and Token ID of the ERC-721 NFT you want to list for rent.
+                  </p>
+                </div>
+              )}
 
               {/* Info */}
               <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-3">
